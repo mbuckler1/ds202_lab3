@@ -1,0 +1,119 @@
+---
+title: "individual1"
+author: "Molly Buckler"
+date: "9/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##My partner and I did the lab idividually because in the email that was sent out it said we could.
+
+```{r}
+library(ggplot2)
+library(classdata)
+library(plyr)
+library(dplyr)
+library(readxl) # install.packages('readxl')
+library(tidyverse)
+
+```
+
+```{r}
+install.packages('readxl',repos = "http://cran.us.r-project.org")
+dat <- readxl::read_xls('life.tar/life/GSS.xls')
+```
+
+##Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
+
+```{r}
+head(dat)
+dat$`Highest year of school completed` <- as.numeric(as.character(dat$`Highest year of school completed`))
+mYearEdPol <- aggregate( `Highest year of school completed` ~ `Political party affiliation`, dat, mean )
+mYearEdPol
+oMYearEdPol <- mYearEdPol[order(-mYearEdPol$`Highest year of school completed`),]
+oMYearEdPol
+```
+
+##The average for highest year of school completed was highest in the category "strong republican" and it was lowest in the category "don't know"
+
+##Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.
+
+```{r}
+
+betterEd <- filter(dat, `Highest year of school completed` > 13)
+head(betterEd)
+```
+
+
+##How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.
+
+```{r}
+dat2 <- dat  %>% group_by(`Marital status`) %>% count(`General happiness`)
+dat2
+ggplot(dat2, aes(fill=`General happiness`, y=n, x=`Marital status`)) + 
+    geom_bar(position="fill", stat="identity")
+```
+
+
+##As shown in the graph relationship status does have an effect on general happiness. The graph shows the percentage of general happiness based on marital status. Married people have the highest happiness percent happy when you combine "very happy" and "pretty happy" and seperated has the lowest percent happy when you combine "very happy" and "pretty happy".
+
+##Does party affiliation affect the relationship you found in the last question?
+
+```{r}
+dat3 <- dat %>% group_by(`Political party affiliation`) %>% count(`General happiness`)
+dat3
+dat3order <- dat3[order(-dat3$`n`),]
+dat3order
+
+```
+
+##Not strong democrat with pretty happy has the highest count.
+
+
+##How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?
+
+```{r}
+mYearEdMart <- aggregate( `Highest year of school completed` ~ `Marital status`, dat, mean )
+mYearEdMart
+oMYearEdMart <- mYearEdMart[order(-mYearEdMart$`Highest year of school completed`),]
+oMYearEdMart
+p<-ggplot(data=oMYearEdMart, aes(x=`Marital status`, y=`Highest year of school completed`)) +
+  geom_bar(stat="identity")
+p
+```
+
+##The possible reasons for the pattern that is shown is that people never married is second highest because people with more education would not get married for reasons such as finish school or focussing on a career, people with more education typically have higher paying jobs and there for don't need duel income so they may see it as not as nessessary to get married. Divorced comes in with the third highest. The reason for this pattern may be due to people with higher education typically make more money and it cost a fair amount to get divorced so it is a easier option for some more than others. I couldn't come up with a reason why widowed would have the lowest education level.
+
+
+##Explore two more interesting questions, and answer those questions using the GSS data.
+
+```{r}
+mYearEdSex <- aggregate( `Highest year of school completed` ~ `Respondents sex`, dat, mean )
+mYearEdSex
+oMYearEdSex <- mYearEdSex[order(-mYearEdSex$`Highest year of school completed`),]
+oMYearEdSex
+a<-ggplot(data=oMYearEdSex, aes(x=`Respondents sex`, y=`Highest year of school completed`)) +
+  geom_bar(stat="identity")
+a
+```
+
+##I choose to look at the relationship between sex and highest year of school completed. Males on average have slightly higher years of school completed with males at 12.99 and females at 12.77. The reason for this pattern is that males are more likely to attend more school in order to get a higher paying job.
+
+```{r}
+sexPol <- dat  %>% group_by(`Respondents sex`) %>% count(`Political party affiliation`)
+sexPol
+sexPolOrder <- sexPol[order(-sexPol$`n`),]
+sexPolOrder
+ggplot(sexPol, aes(fill=`Respondents sex`, y=n, x=`Political party affiliation`)) + 
+    geom_bar(position="fill", stat="identity")
+```
+
+##This shows that females have the most of not strong democrats. The graph shows the percentage of females vs male in each category of political party affiliation.
+
+
+
+}
+
